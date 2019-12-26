@@ -17,10 +17,15 @@ import org.apache.flink.util.Collector;
 public class FirstFlink_stream {
 	public static void main(String[] args) throws Exception {
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+		env.setParallelism(1);
+		DataStreamSource<String> socketTextStream = env.socketTextStream("localhost", 9999);
+		socketTextStream.map((item) -> Tuple2.of(item, 1)).returns(Types.TUPLE(Types.STRING,Types.INT)).keyBy(0)
+		.timeWindow(Time.seconds(5),Time.seconds(2))
+		.sum(1)
+		.print();
 		
-		
-		
-		
+		env.execute();
+
 //		DataStreamSource<String> socketTextStream = env.socketTextStream("localhost", 9999);
 //		socketTextStream.flatMap((String i,Collector<Tuple2<String,Integer>> c)->{
 //			String[] split = i.split(",");
@@ -31,7 +36,7 @@ public class FirstFlink_stream {
 //		  .timeWindow(Time.seconds(5)).sum(1).print().setParallelism(1);
 //		
 //		env.execute("FirstFlink_stream");
-		
+
 //		DataStreamSource<Long> setParallelism = env.addSource(new SourceFuction()).setParallelism(1);
 //		SplitStream<Long> split = setParallelism.split(new OutputSelector<Long>() {
 //			
@@ -51,15 +56,13 @@ public class FirstFlink_stream {
 //		});
 //		split.select("even").print();
 //		env.execute("FirstFlink_stream");
-		
-		
+
 //		DataStreamSource<Long> setParallelism1 = env.addSource(new SourceFuction()).setParallelism(1);
 //		DataStreamSource<Long> setParallelism2 = env.addSource(new SourceFuction()).setParallelism(1);
 //		DataStream<Long> union = setParallelism1.union(setParallelism2);
 //		union.print();
 //		env.execute("FirstFlink_stream");
-		
-		
+
 //		env.addSource(new SourceFuction()).setParallelism(1)
 //		   .map((i) -> {
 //			   System.out.println("map: "+i);
@@ -71,12 +74,11 @@ public class FirstFlink_stream {
 
 //		env.addSource(new SourceFuction()).setParallelism(1).print().setParallelism(1);
 //		env.execute("FirstFlink_stream");
-		
-		
+
 //		DataStreamSource<String> socketTextStream = env.socketTextStream("localhost", 9999);
 //		socketTextStream.map((i)->i.toLowerCase()).print();
 //		env.execute("FirstFlink_stream");
-		
+
 //		DataStreamSource<String> text = env.socketTextStream("localhost", 9999);
 //		text.flatMap((String i, Collector<Tuple2<String, Integer>> collector) -> {
 //			collector.collect(new Tuple2<String, Integer>(i, 1));
